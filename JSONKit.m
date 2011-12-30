@@ -351,7 +351,6 @@ typedef struct JKFastClassLookup JKFastClassLookup;
 typedef struct JKEncodeCache     JKEncodeCache;
 typedef struct JKEncodeState     JKEncodeState;
 typedef struct JKObjCImpCache    JKObjCImpCache;
-typedef struct JKHashTableEntry  JKHashTableEntry;
 
 typedef id (*NSNumberAllocImp)(id receiver, SEL selector);
 typedef id (*NSNumberInitWithUnsignedLongLongImp)(id receiver, SEL selector, unsigned long long value);
@@ -871,12 +870,6 @@ static void _JKArrayRemoveObjectAtIndex(JKArray *array, NSUInteger objectIndex) 
 @end
 
 #pragma mark -
-@interface JKDictionary : NSMutableDictionary <NSCopying, NSMutableCopying, NSFastEnumeration> {
-  NSUInteger count, capacity, mutations;
-  JKHashTableEntry *entry;
-}
-@end
-
 @implementation JKDictionary
 
 + (id)allocWithZone:(NSZone *)zone
@@ -1100,6 +1093,18 @@ static JKHashTableEntry *_JKDictionaryHashTableEntryForKey(JKDictionary *diction
 {
   NSParameterAssert((entry != NULL) && (count <= capacity));
   return([[NSMutableDictionary allocWithZone:zone] initWithDictionary:self]);
+}
+
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)selector
+{
+    NSMethodSignature *sig = [NSMethodSignature signatureWithObjCTypes:"@@:"];
+    return sig;
+}
+
+- (void)forwardInvocation:(NSInvocation *)invocation {
+    NSString *sel = NSStringFromSelector([invocation selector]);
+    NSString *obj = [self objectForKey:sel];
+    [invocation setReturnValue:&obj];
 }
 
 @end

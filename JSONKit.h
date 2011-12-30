@@ -133,8 +133,15 @@ enum {
   JKSerializeOptionValidFlags           = (JKSerializeOptionPretty | JKSerializeOptionEscapeUnicode | JKSerializeOptionEscapeForwardSlashes),
 };
 typedef JKFlags JKSerializeOptionFlags;
+typedef struct JKHashTableEntry  JKHashTableEntry;
 
 #ifdef    __OBJC__
+    
+@interface JKDictionary : NSMutableDictionary <NSCopying, NSMutableCopying, NSFastEnumeration> {
+    NSUInteger count, capacity, mutations;
+    JKHashTableEntry *entry;
+}
+@end
 
 typedef struct JKParseState JKParseState; // Opaque internal, private type.
 
